@@ -142,15 +142,17 @@ func DefaultHttpClient() *http.Client {
 	return httpClient
 }
 
+// VerboseToStdErr formatand prints message to stderr, if either `--verbose` or `--verbose-sensitive-output` were passed.
+// It is a responsibility of the user to call SanitizeUnsafe on all arguments that can contain sensitive data.
 func VerboseToStdErr(format string, message ...interface{}) {
-	if viper.GetBool("verboseOutput") {
+	if viper.GetBool("verbose") {
 		log.Printf(fmt.Sprintf("%s\n", format), message...)
 	}
 }
 
-// SanitizeUnsafe replaces the message data with redacted literal unless `--verbose-sensitive-output` was passed
+// SanitizeUnsafe replaces the message data with redacted literal unless `--verbose-sensitive-output` was passed.
 func SanitizeUnsafe(message interface{}) interface{} {
-	if viper.GetBool("verboseOutput") && !viper.GetBool("verboseUnsafe") {
+	if viper.GetBool("verboseRedact") {
 		messageLen := len(fmt.Sprintf("%s", message))
 		return fmt.Sprintf("***REDACTED(%v characters)***", messageLen)
 	} else {
